@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Tasks Details{% endblock title %}
+
+{% block navbar %}
+{% include 'navbar.html' %}
+{% endblock navbar %}
+{% block content %}
+
+<section class="flex flex-col items-center justify-center mx-auto gap-8">
+
+    <div class="flex flex-row gap-8 justify-center items-center gap-8">
+        <div class="flex w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+            <form class="flex-col w-full space-y-6" action="{% url 'task_detail' task.id %}" method="POST">
+                {% csrf_token %}
+
+                <h5 class="text-2xl text-center font-bold text-gray-900 dark:text-white">Update Task</h5>
+                <div>
+                    <label for="title"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
+                    <input type="text" name="title" id="title"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                        placeholder="Title of task" required />
+                </div>
+                <div>
+                    <label for="description"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                    <textarea name="description" id="description" rows="4"
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="Write a description here..."></textarea>
+                </div>
+                <div class="flex items-start mb-5">
+                    <div class="flex items-center h-5">
+                        <input id="id_important" name="important" type="checkbox" value="true"
+                            class="w-4 h-4 border border-gray-300 rounded-sm bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800" />
+                    </div>
+                    <label for="id_important"
+                        class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Important</label>
+                </div>
+
+                <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    Update
+                </button>
+
+            </form>
+        </div>
+
+        <div class="flex flex-col w-full justify-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex flex-col w-full space-y-6 justify-center">
+                <h5 class="text-xl font-medium text-gray-900 dark:text-white flex justify-center">{{ task.title }}</h5>
+
+                <p class="w-full text-sm text-gray-900 dark:text-white "> {{ task.description }} </p>
+
+                <div class="flex items-start mb-5">
+                    <div class="flex items-center h-5">
+                        <input id="id_important" name="important" type="checkbox" value=""
+                            class="w-4 h-4 border border-gray-300 rounded-sm bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
+                            {% if task.important %}checked{% endif %} />
+                    </div>
+                    <label for="id_important" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                        {% if task.important %}Important{% else %}Irrelevant{% endif %}</label>
+                </div>
+                <div class="flex items-start mb-5">
+                    {% if task.datecompleted is not None %}
+                    <p class="text-white font-bold" >Completed at: {{ task.datecompleted|date:'M j Y H:i' }}</p>
+                    {% else %}
+                    <p class="text-red-500 font-bold">Not completed</p>
+                    {% endif %}
+                </div>
+                <div class="flex items-start mb-5 flex-col gap-2 dark:text-white">
+                    <p>Created: </p>
+                    <p class="flex w-full justify-center">{{ task.created }}</p>
+                </div>
+                <form action="{% url 'complete_task' task.id %}" method="POST">
+                    {% csrf_token %}
+                    <button class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Completed
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+    <a href="{% url 'tasks' %}"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        <svg class="w-6 h-6 text-white dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            fill="none" viewBox="0 0 14 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 5H1m0 0 4 4M1 5l4-4"></path>
+        </svg>
+        <span class="sr-only">Icon description</span>
+    </a>
+
+
+</section>
+
+{% endblock %}

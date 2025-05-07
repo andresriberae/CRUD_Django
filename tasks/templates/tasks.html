@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}Tasks{% endblock title %}
+
+{% block navbar %}
+{% include 'navbar.html' %}
+{% endblock navbar %}
+{% block content %}
+
+<section class="flex flex-col justify-center w-full">
+
+    <div class="flex flex-col w-full lg:flex-row justify-center items-center p-2 lg:px-8 gap-8">
+
+        <div
+            class="flex w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+            <form class="flex-col w-full space-y-6" action="{% url 'tasks' %}" method="POST">
+                {% csrf_token %}
+
+                <h5 class="text-2xl text-center font-bold text-gray-900 dark:text-white">Create Task</h5>
+                <div>
+                    <label for="title"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
+                    <input type="text" name="title" id="title"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                        placeholder="Title of task" required />
+                </div>
+                <div>
+                    <label for="description"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                    <textarea name="description" id="description" rows="4"
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="Write a description here..."></textarea>
+                </div>
+                <div class="flex items-start mb-5">
+                    <div class="flex items-center h-5">
+                        <input id="id_important" name="important" type="checkbox" value="true"
+                            class="w-4 h-4 border border-gray-300 rounded-sm bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800" />
+                    </div>
+                    <label for="id_important"
+                        class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Important</label>
+                </div>
+
+                <button type="submit"
+                    class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add
+                    Task</button>
+
+            </form>
+        </div>
+        {% if tasks %}
+        <div class="hidden md:block border border-gray-200 shadow-sm">
+
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">
+                            Title
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Description
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Important
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Status
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for task in tasks %}
+                    <tr
+                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <th scope="row"
+                            class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                            <div class="text-base font-semibold">{{ task.title }}</div>
+                        </th>
+                        <td class="px-6 py-4">
+                            {{ task.description|truncatechars:20 }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                {% if task.important != True %}
+                                <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div> irrelevant
+                                {% else %}
+                                <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Important
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                {% if task.datecompleted is not None %}
+                                <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div> finished
+                                {% else %}
+                                <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Active
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 flex items-center gap-2">
+                            <a href="{% url 'task_detail' task.id %}"
+                                class="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">View</a>
+                            <form action="{% url 'delete_task' task.id %}" method="POST">
+                                {% csrf_token %}
+                                <button
+                                    class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+        <div class="md:hidden flex flex-wrap justify-center gap-2">
+
+
+
+            {% for task in tasks %}
+            <div
+                class="{% if task.important %} bg-red-500 text-white {% else %}bg-white {% endif %} w-full max-w-sm p-4 border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                <h5
+                    class="mb-3 text-base font-semibold{% if task.important %} text-white {% else %} text-gray-900{% endif %} md:text-xl dark:text-white">
+                    {{ task.title }}</h5>
+
+                <p
+                    class="text-sm font-normal {% if task.important %} text-white {% else %} text-gray-500{% endif %} dark:text-gray-400">
+                    {{ task.description }}</p>
+
+
+                <div
+                    class="flex items-center font-semibold{% if task.important %} text-white {% else %} text-gray-500{% endif %} mt-2">
+
+                    {% if task.datecompleted is not None %}
+                    <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div> finished
+                    {% else %}
+                    <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Active
+                    {% endif %}
+                </div>
+
+                <div class="flex gap-2 mt-4">
+                    <a href="{% url 'task_detail' task.id %}"
+                        class="{% if task.important %} text-white bg-green-700{% else %} text-green-700 border-green-700{% endif %} hover:text-white border hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">View</a>
+                    <a href="{% url 'delete_task' task.id %}"
+                        class="{% if task.important %} text-white bg-red-700{% else %} text-red-700 border-red-700{% endif %} hover:text-white border hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">Delete</a>
+
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}
